@@ -3,7 +3,8 @@ import classes from './App.module.css';
 import Persons from '../Components/Persons/Persons';
 import Cockpit from '../Components/Cockpit/Cockpit';
 import withClass from '../Components/hoc/withClass';
-import Aux from '../Components/hoc/Aux';
+import Aux from '../hoc/Aux';
+import AuthContext from '../context/auth-context.js'
 
 class App extends Component {
   constructor(props) {
@@ -13,14 +14,15 @@ class App extends Component {
 
   state = {
     persons: [
-      { id: 'slkfj', name: 'Max', age: '28' },
+      { id: 'slkfj', name: 'Max', age: 28 },
       { id: 'oisj', name: 'Manu', age: 29 },
       { id: 'lkjsw', name: 'Stephanie', age: 26 }
     ],
     otherState: 'some other value',
     showPersons: false,
     showCockpit: true,
-    changeCounter: 0
+    changeCounter: 0,
+    authenticated: false
   }
 
   static getDerivedStateFromProps(props,state) {
@@ -81,6 +83,10 @@ class App extends Component {
 
   }
 
+  loginHandler= () => {
+    this.setState({authenticated:true});
+  };
+
   render () {
     console.log('[App.js] render')
 
@@ -90,7 +96,8 @@ class App extends Component {
       persons = <Persons
       persons = {this.state.persons}
       clicked = {this.deletePersonHandler}
-      changed = {this.nameChangedHandler} />;
+      changed = {this.nameChangedHandler}
+      isAuthenticated = {this.state.authenticated}/>;
     }
 
     return (
@@ -99,12 +106,18 @@ class App extends Component {
     }}
     > Remove Cockpit
     </button>
+    <AuthContext.Provider value = {{
+      authenticated: this.state.authenticated,
+      login: this.loginHandler
+    }}>
     {this.state.showCockpit? (<Cockpit
       title = {this.props.appTitle}
       showPersons= {this.state.showPersons}
       personsLength = {this.state.persons.length}
-      clicked = {this.togglePersonsHandler}/>) : null}
+      clicked = {this.togglePersonsHandler}
+      />) : null}
       {persons}
+      </AuthContext.Provider>
       </ Aux>
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
